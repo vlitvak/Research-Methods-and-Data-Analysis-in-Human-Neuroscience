@@ -1,4 +1,4 @@
-# Linear Modelling
+# Linear Modelling and Statistical Tests
 
 ## A Simple Simulated Example
 Consider a simple linear model with two conditions and a linear effect that varies over (e.g.) time.
@@ -52,9 +52,9 @@ In MATLAB, i.i.d. Gaussian random values with a variance of 1 can be created usi
 To give the values a variance of 4, we multiply the random numbers by the standard deviation (the square root of the variance).
 The following snippet can be copy/pasted into MATLAB to simulate some data according to our model.
 ```
-beta_gt   = [30; 35; 2];
-v_gt = 4;
-y         = X*beta_gt + randn(10,1)*sqrt(v_gt);
+beta_gt = [30; 35; 2];
+v_gt    = 4;
+y       = X*beta_gt + randn(10,1)*sqrt(v_gt);
 ```
 
 ## Estimating Model Parameters
@@ -193,8 +193,9 @@ whereas the p value from the F statistic is equivalent to that from a two-tailed
 Suppose we were to double the lengths of ``y`` and ``X`` by replicating their values.
 One way to do this is
 ```
-y2 = kron(y,[1;1]);
-X2 = kron(X,[1;1]);
+T  = kron(eye(size(y,1)),[1 1]');
+y2 = T*y;
+X2 = T*X;
 ```
 We can compute a t statistic from these by copy/pasting the following into MATLAB.
 ```
@@ -208,23 +209,31 @@ p2 = 1-spm_Tcdf(t2,nu)
 
 You should notice that the new p value ``p2`` is much smaller than the one from the original t test.
 We should not be able to get extra statistical significance like this for free, so what is wrong?
-The answer is that the statistical analysis has not accounted for the covariance in the data,
-which has the structure
-```
-S = kron(eye(10),ones(2));
-```
-If we know this covariance, then it can be included within the various matrix operations of the statistical analysis
-to make it correct.
-You don't need to know or understand the details, but this is done as follows:
-WORK IN PROGRESS
-```
-beta2 = (X2' * S * X2) \ X2'* S *y2
-nu2 = size(X2,1) - rank(X2);
-r2  = y2 - X2*beta2;
-v2  = (r2' * S * r2)/nu2
-t2 = (c * beta2) / sqrt(v2 * c * inv(X2' * S * X2) * c')
-p2 = 1-spm_Tcdf(t2, nu2)
-```
 
+The answer is that the statistical analysis does not account for the noise no longer being i.i.d.
+There is now covariance in the data.
+If we know this covariance, then it can be included within the various matrix operations of the statistical analysis
+to correct it.
+In fMRI, there are temporal correlations in the time series noise, which needs to be accounted for when doing statistical analyses within subject.
+
+
+
+
+You don't need to know or understand the details, but this could be done as follows:
+```
+V     = T*T';                                               % Covariance matrix
+L     = pinv(V);                                            % Precision matrix
+beta2 = (X2' * L * X2) \ X2'* L *y2                         % Parameter estimates
+R     = L*(eye(size(X2,1)) - X2*inv(X2'*L*X2)*X2'*L);       % Residual forming matrix
+nu2   = trace(R*V);                                         % Degrees of freedom
+v2    = y2'*R*y2/nu2                                        % Variance
+t2    = (c * beta2) / sqrt(v2 * c * inv(X2' * L * X2) * c') % t statistic
+p2    = 1-spm_Tcdf(t2, nu2)                                 % p value
+```
+An easier way would be to "pre-whiten" the data and design matrix.
+```
+y3 = pinv(T)*y2;
+X3 = pinv(T)*X2;
+```
 
 
