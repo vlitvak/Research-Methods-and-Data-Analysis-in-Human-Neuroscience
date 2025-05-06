@@ -134,11 +134,12 @@ Sometimes, we swap around the rows and columns of a matrix. This is called trans
 A'
 ```
 which gives the answer
-```matlab
+```
      1     3     5
      2     4     6
 ```
 
+    
 ## Least Squares Fitting
 In SPM, we work with over-determined problems, where there are more knowns than unknowns.
 For example, consider the following set of equations:
