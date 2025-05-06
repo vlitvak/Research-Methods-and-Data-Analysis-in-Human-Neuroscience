@@ -40,13 +40,14 @@ indicates that $\boldsymbol{\epsilon}$ comes from a zero-mean i.i.d. Gaussian (n
 We can generate some simulated data (``y``) according to this model, where we use $\boldsymbol{\beta}$ values of 30.0, 35.0 and 2.0
 and a variance of 4.0.
 
-!!! info "Gaussian distribution"
-    The formula for the probability density of ${\bf x}$ under a multivariate Gaussian distribution of
-     mean $\boldsymbol{\mu}$ and variance/covariance $\boldsymbol{\sigma}$ is $
-     p({\bf x} | \boldsymbol{\mu}, \boldsymbol{\Sigma}) =
-     \frac{\exp\left(
+The formula for the probability density of ${\bf x}$ under a $D$-dimensional multivariate Gaussian distribution of mean $\boldsymbol{\mu}$ and variance/covariance $\boldsymbol{\Sigma}$ is:
+
+$$
+p({\bf x} | \boldsymbol{\mu}, \boldsymbol{\Sigma}) =
+\frac{\exp\left(
      -\frac{1}{2} ({\bf x} - \boldsymbol{\mu})^T \boldsymbol{\Sigma}^{-1} ({\bf x} - \boldsymbol{\mu})
-     \right)}{\sqrt{(2 \pi)^D \det | \boldsymbol{\Sigma} |}}$
+\right)}{\sqrt{(2 \pi)^D \det | \boldsymbol{\Sigma} |}}
+     $$
      
 In MATLAB, i.i.d. Gaussian random values with a variance of 1 can be created using the ``randn()`` function.
 To give the values a variance of 4, we multiply the random numbers by the standard deviation (the square root of the variance).
@@ -124,9 +125,40 @@ Without any correction for multiple comparisons, we can obtain the p value for t
 p = spm_Tcdf(-t,nu)
 % or
 p = 1-spm_Tcdf(t,nu)
-
 ```
 
+As we will be doing something similar many times, I suggest creating a MATLAB function to do this.
+Create a file called ``t_stat.m`` somewhere on MATLAB's search path, which contains the following:
+```
+function [p, t] = t_stat(y, X, c)
+% Compute t statistics
+% FORMAT [p, t] = t_stat(y, X, c)
+% y - data
+% X - design matrix
+% c - contrast vector
+% p - p value
+% t - t statistic
+
+% Error checking
+assert(ndims(y)<=2 && ndims(X)<=2 && size(y,1)==size(X,1),...
+       'Lengths of data and design matrix do not match.')
+assert(ndims(c)<=2 && size(c,1)==1 && size(c,2)==size(X,2),...
+       'Length of contrast vector does not match the number of design matrix columns.')
+assert(size(X,1)>rank(X),...
+       'Over-determined design matrix.')
+
+% Things computed via SPM's Estimate button
+nu   = size(X,1) - rank(X); % Degrees of freedom (saved in SPM.mat)
+beta = (X'*X)\X'*y;         % Beta values (beta_XXXX.nii files)
+r    = y - X*beta;          % Residuals
+v    = sum(r.^2)/nu;        % Variance (ResMS.nii)
+
+% Things computed once the contrast vector is specified
+con  = c*beta;              % Contrast (con_XXXX.nii)
+tmp  = c*inv(X'*X)*c';
+t    = con./sqrt(v*tmp);    % T statistic (spmT_XXXX.nii)
+p    = spm_Tcdf(-t,nu);     % P value
+```
 
 ### F Statistic
 F tests are a bit harder to explain than t tests.
@@ -188,6 +220,60 @@ p = 1 - spm_Fcdf(F, nu)
 You should notice that the p value given from the F statistic is twice as large as that from the t statistic.
 The reason for this is that the t static is based on a one-tailed t test,
 whereas the p value from the F statistic is equivalent to that from a two-tailed t test.
+
+As we may be running F tests again, I would suggest creating an ``F_stat.m`` file somewhere on MATLAB's search path, which contains the following:
+```
+function [p, F] = F_stat(y, X, C)
+% Compute F statistics
+% FORMAT [p, F] = F_stat(y, X, C)
+% y - data
+% X - design matrix
+% C - contrast vector/matrix
+% p - p value
+% F - F statistic
+
+% Error checking
+assert(ndims(y)<=2 && ndims(X)<=2 && size(y,1)==size(X,1),...
+       'Lengths of data and design matrix do not match.')
+assert(ndims(c)<=2 && size(c,2)==size(X,2),...
+       'Length of contrast vector does not match the number of design matrix columns.')
+assert(size(X,1)>rank(X),...
+       'Over-determined design matrix.')
+
+nu2  = size(X,1)-rank(X);
+beta = (X'*X)\X'*y;
+r    = y - X*beta;
+v    = sum(r.^2)/nu2;
+
+Nc = null(c);
+X0 = X*Nc;
+nu = [rank(X)-rank(X0), nu2];
+beta0 = inv(Nc'*X'*X*Nc)*Nc'*X*y;
+
+r0 = y - X0*beta0;
+v0 = (sum(r0.^2) - sum(r.^2))/nu(1)
+
+%v0 = r0'*r0
+XX = X'*X;
+%v0 = y'*y - beta'*XX*Nc*inv(Nc'*XX*Nc)*Nc'*XX*beta
+%v0 = beta'*XX*beta - beta'*XX*Nc*inv(Nc'*XX*Nc)*Nc'*XX*beta
+
+v0 = (beta'*(XX - XX*Nc*inv(Nc'*XX*Nc)*Nc'*XX)*beta)/nu(1)
+
+F  = v0/v
+
+% Things computed via SPM's Estimate button
+nu2  = size(X,1) - rank(X); % Degrees of freedom (saved in SPM.mat)
+beta = (X'*X)\X'*y;         % Beta values (beta_XXXX.nii files)
+r    = y - X*beta;          % Residuals
+v    = sum(r.^2)/nu;        % Variance (ResMS.nii)
+
+% Things computed once the contrast vector is specified
+con  = c*beta;              % Contrast (con_XXXX.nii)
+tmp  = c*inv(X'*X)*c';
+t    = con./sqrt(v*tmp);    % T statistic (spmT_XXXX.nii)
+p    = spm_Tcdf(-t,nu);     % P value
+```
 
 ## Temporal correlations
 Suppose we were to double the lengths of ``y`` and ``X`` by replicating their values.
