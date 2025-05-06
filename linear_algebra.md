@@ -84,7 +84,7 @@ We can access the individual elements of this matrix by e.g. For the element $x_
 X(2,3)
 ```
 
-In MATLAB, this can be solved to give a solution $\mathbf{\beta}$ using:
+In MATLAB, the above simultaneous equations can be solved to give a solution $\mathbf{\beta}$ using:
 ```matlab
 beta = X\y
 ```
