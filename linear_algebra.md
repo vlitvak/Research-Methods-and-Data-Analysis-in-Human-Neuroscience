@@ -140,7 +140,8 @@ which gives the answer
 ```
 
 ## Least Squares Fitting
-In SPM, we usually work with over-determined problems, where there are more knowns than unknowns. For example:
+In SPM, we work with over-determined problems, where there are more knowns than unknowns.
+For example, consider the following set of equations:
 
 $$
 \begin{matrix}
@@ -152,10 +153,11 @@ a + 5b & = 13
 \end{matrix}
 $$
 
-There is no actual solution to the above set of equations because the equations are not consistent with each other.
+There is no actual solution to the above set of equations because they are not consistent with each other.
 Instead, the aim is usually to find the solution that minimises the sum of squared errors (which can be considered as a squared distance according to Pythagoras' theorem).
+In this example, the equations are set up for fitting a straight line through some data, where the line is modelled by an intercept ($a$) and slope ($b$).
 
-We have a matrix ``X``:
+We have a design matrix ``X``:
 ```matlab
 X = [1 1
      1 2
@@ -163,7 +165,7 @@ X = [1 1
      1 4
      1 5]
 ```
-and a vector ``y``:
+and a data vector ``y``:
 ```matlab
 y = [5 7.5 9 11.5 13]'
 ```
