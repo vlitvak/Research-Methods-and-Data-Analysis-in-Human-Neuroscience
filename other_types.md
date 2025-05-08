@@ -114,6 +114,39 @@ This example shows the how numbers from 0 to 255 map to ASCII characters:
 reshape(char(0:255),32,8)'
 ```
 
+### Some other Functions that work on Arrays
+
+Arrays can be added and subtracted, providing their dimensions are compatible. Try this example:
+```matlab
+Y = 1:8;
+X = (1:3)'*10;
+disp(X+Y)
+disp(X-Y)
+```
+Elements of arrays can be multiplied and divided in a similar way, but to distinguish it from matrix multiplication or matrix division, the notation uses ``.*`` or ``./``.
+```matlab
+disp(X.*Y)
+disp(X./Y)
+```
+Note that ``+``, ``-``, ``.*`` and ``./`` are actually shorthand for ``plus``, ``minus``, ``times`` and ``rdivide``.
+```matlab
+disp(plus(X,Y))
+disp(minus(X,Y))
+disp(times(X,Y))
+disp(rdivide(X,Y))
+```
+
+Other useful functions that can be applied to arrays include ``sum``, ``mean``, ``prod``, ``cumsum`` and ``cumprod``.
+```matlab
+X = rand(2,10);
+disp(sum(X,2))
+disp(prod(X,2))
+disp(cumsum(X,2))
+disp(cumprod(X,2))
+```
+
+
+
 
 
 
