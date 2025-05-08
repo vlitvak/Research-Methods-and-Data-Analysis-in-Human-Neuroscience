@@ -63,8 +63,17 @@ selected = X==4 | X==6
 ```
 
 Sometimes it is useful to have the indices of which elements are true, in which case the ``find`` function can be useful:
-```
+```matlab
 indices = find(selected)
+```
+Functions that can be used on logical arrays include ``all`` and ``any``, where the second argument indicates which dimension to work with. Here are some examples:
+```matlab
+X = [true true false
+     true false false];
+all(X)
+all(X,2)
+any(X)
+any(X,2)
 ```
 
 ### Char
