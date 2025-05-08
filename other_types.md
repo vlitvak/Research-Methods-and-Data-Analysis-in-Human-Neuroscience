@@ -76,7 +76,7 @@ any(X,2)
 ```
 
 ### Char
-Character arrays can be very useful. Each element of these is a single byte, but an array of these can represent text, such as filenames. Note that the ``disp`` function is used to show the values of variables.
+Character arrays can be very useful. Since the advent of Unicode (to enable emojis and other alphabets), character arrays in MATLAB can contain an extremely diverse range of characters, although MATLAB does not allow all of them to be seen (e.g. `char(0x1F60A)`). Character arrays are usually used to represent text, such as filenames. Note that the ``disp`` function is used to show the values of variables.
 ```matlab
 words = 'hello world';
 disp(words)
