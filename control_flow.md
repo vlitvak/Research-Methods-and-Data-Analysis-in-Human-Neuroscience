@@ -102,17 +102,18 @@ end
 disp(number)
 ```
 
-## Functions
-Series of instructions are often bundeled together into functions. 
-Many functions only return a single answer. For example, ``sin`` is a built-in function that returns one answer in the following:
+## Using Functions
+Series of instructions are often bundeled together into functions. In MATLAB, these have input arguments and output arguments.
+Many functions only return a single output argument. For example, ``sin`` is a built-in function that returns a single output.
+In the following example, ``x`` is the input argument, and ``y`` is the output argument.
 ```matlab
 x = 0:0.01:2*pi;
 y = sin(x);
 plot(x,y)
 ```
 
-Other functions may return several different answers, in which case these need to be surrounded by square brackets.
-An occasionally useful example might be the following, which does something called singular value decomposition (which we may return to later):
+Other functions may return several output arguments, in which case these need to be surrounded by square brackets.
+An occasionally useful example might be the following, which does something called singular value decomposition (which we may return to later)
 ```matlab
 X = randn(5,3);
 [U,S,V] = svd(X);
@@ -120,6 +121,7 @@ X = randn(5,3);
 
 Help about using a functions can be found by typing ``help`` followed by a space and then the name of the function.
 
+## Creating Functions
 You can create your own functions by editing a file, which ends in the prefix ``.m``, that is somewhere in the search path that MATLAB uses.
 You can see this search path by typing:
 ```matlab
@@ -133,13 +135,12 @@ If you save the following test as a file called ``quadsol.m``, then it will give
 function [x1, x2] = quadsol(a, b, c)
 % Solution to a*x^2 + b*x + c == 0
 % FORMAT [x1,x2] = quadsol(a,b,c)
-
 tmp = sqrt(b.^2 - 4*a.*c);
 x1  = (-b + tmp)./(2*a); % First solution
 x2  = (-b - tmp)./(2*a); % Second solution
 ```
 
-The first line of the text defines the input (``a``, ``b`` and ``c``) and output (``x1`` and ``x2``) variables.
+The first line of the text defines the input (``a``, ``b`` and ``c``) and output (``x1`` and ``x2``) arguments.
 This is followed by a block of lines that begin with ``%``.
 Normally any text following a ``%`` will be a comment, but in a ``.m`` file, the first block of comments serves as the documentation.
 You can see this documentation by typing:
@@ -200,9 +201,9 @@ end
 ```
 Then it can be called as:
 ```matlab
-factorial5 = pling(5)
-% Compare against
-2*3*4*5
+fact5 = pling(5)
+% Compare against the official MATLAB method:
+factorial(5)
 ```
 
 For anyone interested, a much more complicated example of recursion is shown [here](complicated_recursion.md).
