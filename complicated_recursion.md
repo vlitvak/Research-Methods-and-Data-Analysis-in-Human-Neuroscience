@@ -1,6 +1,7 @@
 ## A More Complicated Example of Recursion
 Anyone really keen to learn about recursion (I suspect very few) might wish to take a look at this code.
-It was written quite quickly, so may not be as elegant as it could be, but it does seem to work.
+There are features in the code that might not be familiar yet (such as .m files consisting of multiple functions),
+but reading (and understanding) examples of code can be a good way to learn. 
 
 Copy/paste the following into a file called ``noughtcross.m``, and type ``noughtcross`` in MATLAB to run it:
 
@@ -13,6 +14,7 @@ function noughtcross
     G = ['   '; '   '; '   '];
 
     % Lets go...
+    game_over(G);
     while(any(any(G==' ')))
 
         % User's go
