@@ -116,7 +116,11 @@ Other functions may return several output arguments, in which case these need to
 An occasionally useful example might be the following, which does something called singular value decomposition (which we may return to later)
 ```matlab
 X = randn(5,3);
-[U,S,V] = svd(X);
+[U,S,V] = svd(X)
+```
+``disp``, which you encountered earlier, is an example of a function that doesn't have output arguments. Other functions don't have input arguments.  Also, functions can change their behaviour depending on how many input and output arguments are specified. For example:
+```matlab
+s = svd(X)
 ```
 
 Help about using a functions can be found by typing ``help`` followed by a space and then the name of the function.
