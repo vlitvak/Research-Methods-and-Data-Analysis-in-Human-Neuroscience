@@ -116,7 +116,16 @@ submatrix = D(3:4,2:4)
 ```
 In the above, ``2:4`` means the values from 2 to 4, (i.e. 2, 3 and 4).
 
+If a matrix is indexed by a single number, then it gets treated as a vectorised version of itself, where all the columns are concatenated together.
+For example, try:
+```matlab
+D(5) = 10;
+disp(D)
+```
+
 ## Other ways to create arrays
+There are various other methods for creating arrays and matrices. Some of them are listed here.
+
 ### Zeros
 The ``zeros`` function can be used to create an array of zeros:
 ```matlab
