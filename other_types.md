@@ -15,12 +15,11 @@ The arrays we have generated so far have used double precision.  Other represent
 #### Single precision floating point
 This representation of floating point numbers uses four bytes, and is less precise than double precision.
 A double precision array can be converted to single precision using the ``single`` function.
+One way that we can look at the effects of numerical precision is by adding numbers together.  Try comparing the results of the following:
 ```matlab
 d = [1e-8 1 -1];
 s = single(d);
-```
-One way that we can look at the effects of numerical precision is by adding numbers together.  Try comparing the results of the following:
-```matlab
+
 sum(d)
 sum(s)
 sum(d(3:-1:1))
