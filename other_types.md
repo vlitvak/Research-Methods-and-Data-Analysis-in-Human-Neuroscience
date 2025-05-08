@@ -77,7 +77,7 @@ any(X,2)
 ```
 
 ### Char
-Character arrays can be very useful. Each element of these is a single byte, but an array of these can represent text, such as filenames.
+Character arrays can be very useful. Each element of these is a single byte, but an array of these can represent text, such as filenames. Note that the ``disp`` function is used to show the values of variables.
 ```matlab
 words = 'hello world';
 disp(words)
@@ -114,21 +114,29 @@ This example shows the how numbers from 0 to 255 map to ASCII characters:
 reshape(char(0:255),32,8)'
 ```
 
-### Some other Functions that work on Arrays
+### Other Functions that work on Arrays
 
-Arrays can be added and subtracted, providing their dimensions are compatible. Try this example:
+Arrays can be added and subtracted, providing their dimensions are compatible. The simplest case is when the arrays are the same size, such as this example:
+```matlab
+Y = randn(3,4);
+X = randn(3,4);
+disp(X+Y)
+```
+Addition and subtraction also work if one of the dimensions is 1.
+Try this example:
 ```matlab
 Y = 1:8;
 X = (1:3)'*10;
 disp(X+Y)
 disp(X-Y)
 ```
+
 Elements of arrays can be multiplied and divided in a similar way, but to distinguish it from matrix multiplication or matrix division, the notation uses ``.*`` or ``./``.
 ```matlab
 disp(X.*Y)
 disp(X./Y)
 ```
-Note that ``+``, ``-``, ``.*`` and ``./`` are actually shorthand for ``plus``, ``minus``, ``times`` and ``rdivide``.
+Note that ``+``, ``-``, ``.*`` and ``./`` are actually a convenient shorthand for the ``plus``, ``minus``, ``times`` and ``rdivide`` functions.
 ```matlab
 disp(plus(X,Y))
 disp(minus(X,Y))
@@ -136,7 +144,7 @@ disp(times(X,Y))
 disp(rdivide(X,Y))
 ```
 
-Other useful functions that can be applied to arrays include ``sum``, ``mean``, ``prod``, ``cumsum`` and ``cumprod``.
+Other useful functions that can be applied to arrays include ``sum``, ``mean``, ``prod`` (product), ``cumsum`` (cumulative sum) and ``cumprod`` (cumulative product).
 ```matlab
 X = rand(2,10);
 disp(sum(X,2))
