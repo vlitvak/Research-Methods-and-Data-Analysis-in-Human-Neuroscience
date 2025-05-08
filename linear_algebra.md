@@ -1,5 +1,70 @@
 # Introduction to Linear Algebra in MATLAB
 
+## Matrix Multiplication
+Matrices can be added and subtracted in a straightforward way.  Providing the dimensions of the matrices are the same, then the corresponding elements are simply added or subtracted. Multiplication is a bit more complicated. Given two matrices $\mathbf{A}$ and $\mathbf{B}$ of sizes $M \times K$ and $K \times N$, then the product of the matrices has size $M \times N$. If $\mathbf{C} = \mathbf{A} \mathbf{B}$, then $c_{mn} = \sum_{k=1}^K a_{mk} b_{kn}$. Here is a quick MATLAB example, where $M=3$, $K=2$ and $N=3$.
+```matlab
+A = [1 2
+     3 4
+     5 6]
+
+B = [11 12 13
+     14 15 16]
+
+C = A*B
+```
+The computations here are:
+
+$$
+\mathbf{C} = \left[\begin{array}{ccc}
+a_{11} b_{11} + a_{12} b_{21}, & a_{11} b_{12} + a_{12} b_{22}, & a_{11} b_{13} + a_{12} b_{23}\\
+a_{21} b_{11} + a_{22} b_{21}, & a_{21} b_{12} + a_{22} b_{22}, & a_{21} b_{13} + a_{22} b_{23}\\
+a_{31} b_{11} + a_{32} b_{21}, & a_{31} b_{12} + a_{32} b_{22}, & a_{31} b_{13} + a_{32} b_{23}
+\end{array}\right]
+$$
+
+Recall that you briefly encountered matrix multiplication in the tutorial about ``for`` loops.
+The following extends the code from the ``for`` loops section into a function, which could be saved as ``matmul.m``:
+```matlab
+function C = matmul(A,B)
+% Matrix multiplication
+% FORMAT C = matmul(A,B)
+if ndims(A)>2 || ndims(B)>2, error('Too many dimensions.'); end
+M = size(A,1);
+K = size(A,2);
+if size(B,1)~=K, error('Incompatible dimensions.'); end
+N = size(B,2);
+C = zeros(M,N);
+for m=1:M
+    for n=1:N
+        for k=1:K
+            C(m,n) = C(m,n) + A(m,k)*B(k,n);
+        end
+    end
+end
+```
+You can test the code with the following, and compare it against MATLAB's much more efficient implementation:
+```matlab
+A = randn(2,3);
+B = randn(3,4);
+C_matmul = matmul(A,B)
+C_mtimes = A*B
+disp(sum(sum((C_matmul - C_mtimes).^2)))
+```
+
+## Transpose
+Sometimes, we swap around the rows and columns of a matrix. This is called transposing. In maths, we would denote transposing matrix $\mathbf{A}$ by $\mathbf{A}^T$. In MATLAB, we would write
+```matlab
+A = [1 2
+     3 4
+     5 6];
+A'
+```
+which gives the answer
+```
+     1     3     5
+     2     4     6
+```
+
 ## Simultaneous equations
 Consider these simultaneous equations in $a$ and $b$:
 
@@ -56,21 +121,7 @@ $$
 
 To do this in MATLAB, we can arrange 20, -45 and 8 into a vector that we call $\mathbf{y}$:
 ```matlab
-y = [20
-    -45
-      8]
-```
-
-Another way to write this is to use the transpose operator ($\mathbf{y}^T$), which swaps the rows for the columns. This operator is written as `` ' `` in MATLAB.
-```matlab
-y = [20 -45 8]'
-```
-
-We can pick out the elements of the vector by
-```matlab
-y(1)
-y(2)
-y(3)
+y = [20; -45; 8]
 ```
 
 The values that $a$, $b$ and $c$ are multiplied by can be arranged into a matrix $\mathbf{X}$:
@@ -79,10 +130,8 @@ X = [ 3 -2  1
      -5  1 -4
       1 -1  1]
 ```
-We can access the individual elements of this matrix by e.g. For the element $x_{23}$ in the 2nd row and 3rd column:
-```matlab
-X(2,3)
-```
+
+If we consider the unknowns as a vector $\boldsymbol{\beta}$, we essentially want to find the values in $\boldsymbol{\beta}$ where $\mathbf{X} \boldsymbol{\beta} = \mathbf{y}$.
 
 In MATLAB, the above simultaneous equations can be solved to give a solution $\mathbf{\beta}$ using:
 ```matlab
@@ -106,39 +155,6 @@ This simply means:
  X(2,1)*beta(1) + X(2,2)*beta(2) + X(2,3)*beta(3)
  X(3,1)*beta(1) + X(3,2)*beta(2) + X(3,3)*beta(3)]
 ```
-
-## Matrix Multiplications
-Matrices can be added and subtracted in a straightforward way.  Providing the dimensions of the matrices are the same, then the corresponding elements are simply added or subtracted. Multiplication is a bit more complicated. Given two matrices $\mathbf{A}$ and $\mathbf{B}$ of sizes $M \times K$ and $K \times N$, then the product of the matrices has size $M \times N$. If $\mathbf{C} = \mathbf{A} \mathbf{B}$, then $c_{mn} = \sum_{k=1}^K a_{mk} b_{kn}$. Here is a quick MATLAB example, where $M=3$, $K=2$ and $N=3$.
-```matlab
-A = [1 2
-     3 4
-     5 6]
-
-B = [11 12 13
-     14 15 16]
-
-C = A*B
-```
-The computations here are:
-
-$$
-\mathbf{C} = \left[\begin{array}{ccc}
-a_{11} b_{11} + a_{12} b_{21}, & a_{11} b_{12} + a_{12} b_{22}, & a_{11} b_{13} + a_{12} b_{23}\\
-a_{21} b_{11} + a_{22} b_{21}, & a_{21} b_{12} + a_{22} b_{22}, & a_{21} b_{13} + a_{22} b_{23}\\
-a_{31} b_{11} + a_{32} b_{21}, & a_{31} b_{12} + a_{32} b_{22}, & a_{31} b_{13} + a_{32} b_{23}
-\end{array}\right]
-$$
-
-Sometimes, we swap around the rows and columns of a matrix. This is called transposing. In maths, we would denote transposing matrix $\mathbf{A}$ by $\mathbf{A}^T$. In MATLAB, we would write
-```matlab
-A'
-```
-which gives the answer
-```
-     1     3     5
-     2     4     6
-```
-
     
 ## Least Squares Fitting
 In SPM, we work with over-determined problems, where there are more knowns than unknowns.
