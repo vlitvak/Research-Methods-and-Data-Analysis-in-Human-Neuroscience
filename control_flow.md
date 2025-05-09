@@ -158,7 +158,7 @@ disp(rdivide(X,Y))
 There are a load of other mathematical operations that can also be applied element-by-element, such as ``sin``, ``cos``, ``tan``, ``log`` and ``exp``.
 
 
-### other Functions of arrays
+### Other Functions of arrays
 
 Some functions that can be applied to arrays, which don't work independently among the elements, include ``sum``, ``mean``, ``prod`` (product), ``cumsum`` (cumulative sum) and ``cumprod`` (cumulative product).
 ```matlab
@@ -170,6 +170,7 @@ disp(cumprod(X,2))
 ```
 
 There are also the matrix operations, which will be covered later.
+
 
 ## Creating Functions
 You can create your own functions by editing a file, which ends in the prefix ``.m``, that is somewhere in the search path that MATLAB uses.
@@ -210,6 +211,31 @@ The function you have created can be called by (for example):
 [r1,r2] = quadsol(4,3,-2)
 ```
 
+### Recursion
+Sometimes it is useful to for a function to include a function call to itself.
+Proper uses of recursion include searching tree structures to find an optimal path (as in games, planning routes, etc), but here is a simple example for computing a factorial.
+Save the following into a file called ``pling.m``:
+```matlab
+function f = pling(n)
+% Factorial
+% FORMAT f = pling(n)
+% Note that this is only to illustrate recursion and is
+% not the optimal way to compute factorials.
+if n==0
+    f = 1;
+else
+    f = pling(n-1)*n;
+end
+```
+Then it can be called as:
+```matlab
+fact5 = pling(5)
+% Compare against the official MATLAB method:
+factorial(5)
+```
+
+For the really curious, a much more complicated example of recursion is shown [here](complicated_recursion.md).  This is entirely optional though.
+
 ## Function Handles
 MATLAB also includes a way to create simple functions that return a single argument. This can be done using ``@``.
 For example, typing the following into MATLAB will create a function called ``quad``:
@@ -233,27 +259,4 @@ x_minmax = -b/(2*a); % Value of x that gives the minimum/maximum of a quadratic
 plot(x, quad(x,a,b,c), '-',  [x1 x2], quad([x1 x2], a, b, c), 'ro-', x_minmax, quad(x_minmax,a,b,c),'rx')
 ```
 
-### Recursion
-Sometimes it is useful to for a function to include a function call to itself.
-Proper uses of recursion include searching tree structures to find an optimal path (as in games), but here is a simple example for computing a factorial.
-Save the following into a file called ``pling.m``:
-```matlab
-function f = pling(n)
-% Factorial
-% FORMAT f = pling(n)
-% Note that this is only to illustrate recursion and is
-% not the optimal way to compute factorials.
-if n==0
-    f = 1;
-else
-    f = pling(n-1)*n;
-end
-```
-Then it can be called as:
-```matlab
-fact5 = pling(5)
-% Compare against the official MATLAB method:
-factorial(5)
-```
 
-For anyone interested, a much more complicated example of recursion is shown [here](complicated_recursion.md).
