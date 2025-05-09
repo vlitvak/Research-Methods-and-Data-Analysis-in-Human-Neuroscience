@@ -259,7 +259,7 @@ axis image
 title('random 1s');
 
 subplot(2,1,2);
-imagesc(G*y*G)
+imagesc(G*y*G')
 axis image
 title('smoothed');
 colormap(gray)
