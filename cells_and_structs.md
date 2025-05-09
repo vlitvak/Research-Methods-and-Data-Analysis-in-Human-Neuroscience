@@ -62,3 +62,24 @@ matlabbatch{1}.spm.spatial.smooth.prefix = 's';
 
 disp(matlabbatch{1}.spm.spatial.smooth)
 ```
+
+## Objects
+MATLAB can also be used for object-oriented programming, where objects can have different things done to them etc.
+This tutorial won't say much about these, other than that it is possible to see what type of object you are dealing with:
+```matlab
+text = 'This is a character array';
+class(text)
+isa(text,'int32')
+isa(text,'char')
+```
+
+It is also sometimes useful to see what variables have been defined on the worskpace, and what they contain. You can do this by typing ``whos``.
+Sometimes you might also wish to remove variables from the workspace, as in the following example:
+```matlab
+clear
+X = randn(3);
+Y = randn(3);
+whos
+clear X
+whos
+```
