@@ -51,21 +51,27 @@ In MATLAB, the main logical operations are:
 * `~`, which indicates the logical ``not`` operation. This takes one input and flips it to the other state.
 
 For single scalar logical values, ``&&`` and  ``||`` are faster way to compute ``and`` or ``or``.
-
 Here are some examples:
 ```matlab
 result = [true true false] & [true false false]
 same_result = and([true true false], [true false false])
-
-X = 1:10;
-selected = X==4 | X==6
 ```
 
-Sometimes it is useful to have the indices of which elements are true, in which case the ``find`` function can be useful:
+It is important to note that a single ``=`` symbol in MATLAB implies an assignment, where the thing on the left-hand-side (lhs) of the sign takes on the value of the thing on the right-hand-side (rhs).
+A different meaning of "equals" is "is equal to", which is denoted by ``==``.
+Here, the aim is to see if the thing on the lhs is equal to the thing on the rhs. This returns logical values of 1 to denote "true" or 0 to denote "false:
+```matlab
+X = [1 2 3; 3 2 1];
+selected = X==3
+selected = X==1 | X==3
+```
+Related operators are ``>`` (is greater than), ``<`` (is less than), ``>=`` (is greater than or equal to) and ``<=`` (is less than or equal to).
+
+Sometimes it is useful to have the indices of which elements of an array are true, in which case the ``find`` function can be useful:
 ```matlab
 indices = find(selected)
 ```
-Functions that can be used on logical arrays include ``all`` and ``any``, where the second argument indicates which dimension to work with. Here are some examples:
+Other functions that can be used on logical arrays include ``all`` and ``any``, where the second argument indicates which dimension to work with. Here are some examples of this:
 ```matlab
 X = [true true false
      true false false];
@@ -76,12 +82,13 @@ any(X,2)
 ```
 
 ### Char
-Character arrays can be very useful. Since the advent of Unicode (to enable emojis and other alphabets), character arrays in MATLAB can contain an extremely diverse range of characters, although MATLAB does not allow all of them to be seen (e.g. `char(0x1F60A)`). Character arrays are usually used to represent text, such as filenames. Note that the ``disp`` function is used to show the values of variables.
+Character arrays can be very useful. Since the advent of Unicode (to enable emojis and other alphabets), character arrays in MATLAB can contain an extremely diverse range of things, although MATLAB does not allow all of them to be seen (e.g. `char(0x1F60A)`). Character arrays are usually used to represent text, such as filenames. Note that the ``disp`` function can be used to show the values of variables.
 ```matlab
 words = 'hello world';
 disp(words)
 disp(char(words + 'A' - 'a'))
 ```
+
 
 ## Higher dimensions
 Arrays can be any number of dimensions, which is useful because an fMRI dataset can be thought of as a 4D array.
@@ -112,46 +119,6 @@ This example shows the how numbers from 0 to 255 map to ASCII characters:
 ```matlab
 reshape(char(0:255),32,8)'
 ```
-
-### Other Functions that work on Arrays
-
-Arrays can be added and subtracted, providing their dimensions are compatible. The simplest case is when the arrays are the same size, such as this example:
-```matlab
-Y = randn(3,4);
-X = randn(3,4);
-disp(X+Y)
-```
-Addition and subtraction also work if one of the dimensions is 1.
-Try this example:
-```matlab
-Y = 1:8;
-X = (1:3)'*10;
-disp(X+Y)
-disp(X-Y)
-```
-
-Elements of arrays can be multiplied and divided in a similar way, but to distinguish it from matrix multiplication or matrix division, the notation uses ``.*`` or ``./``.
-```matlab
-disp(X.*Y)
-disp(X./Y)
-```
-Note that ``+``, ``-``, ``.*`` and ``./`` are actually a convenient shorthand for the ``plus``, ``minus``, ``times`` and ``rdivide`` functions.
-```matlab
-disp(plus(X,Y))
-disp(minus(X,Y))
-disp(times(X,Y))
-disp(rdivide(X,Y))
-```
-
-Other useful functions that can be applied to arrays include ``sum``, ``mean``, ``prod`` (product), ``cumsum`` (cumulative sum) and ``cumprod`` (cumulative product).
-```matlab
-X = rand(2,10);
-disp(sum(X,2))
-disp(prod(X,2))
-disp(cumsum(X,2))
-disp(cumprod(X,2))
-```
-
 
 
 
