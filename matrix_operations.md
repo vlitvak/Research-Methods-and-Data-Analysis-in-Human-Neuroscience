@@ -253,15 +253,21 @@ G = toeplitz(exp(-(0:99).^2/(2*10))/sqrt(2*pi*10));
 y = zeros(100);
 ind = ceil(rand(100,1)*100^2);
 y(ind) = 1;
-subplot(2,1,1);
+subplot(2,2,1);
 imagesc(y)
 axis image
 title('random 1s');
 
-subplot(2,1,2);
+subplot(2,2,2);
+imagesc(G);
+axis image
+title('Convolution matrix')
+
+subplot(2,2,3);
 imagesc(G*y*G')
 axis image
-title('smoothed');
+title('Convolved');
+
 colormap(gray)
 figure(gcf)
 ```
