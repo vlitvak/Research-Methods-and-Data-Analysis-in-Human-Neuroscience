@@ -1,4 +1,4 @@
-# Some Other Matrix Operations
+# More Linear Algebra
 
 ## Singular Value Decomposition
 
