@@ -1,7 +1,7 @@
 # Introduction to Linear Algebra in MATLAB
 
 ## Matrix Multiplication
-Matrices can be added and subtracted in a straightforward way.  Providing the dimensions of the matrices are the same, then the corresponding elements are simply added or subtracted. Multiplication is a bit more complicated. Given two matrices $\mathbf{A}$ and $\mathbf{B}$ of sizes $M \times K$ and $K \times N$, then the product of the matrices has size $M \times N$. If $\mathbf{C} = \mathbf{A} \mathbf{B}$, then $c_{mn} = \sum_{k=1}^K a_{mk} b_{kn}$. Here is a quick MATLAB example, where $M=3$, $K=2$ and $N=3$.
+Matrices can be added and subtracted in a straightforward way.  Providing their dimensions are the same, then the corresponding elements are simply added or subtracted. Multiplication is a bit more complicated. Given two matrices $\mathbf{A}$ and $\mathbf{B}$ of sizes $M \times K$ and $K \times N$, then the product of the matrices has size $M \times N$. If $\mathbf{C} = \mathbf{A} \mathbf{B}$, then $c_{mn} = \sum_{k=1}^K a_{mk} b_{kn}$. Here is a quick MATLAB example, where $M=3$, $K=2$ and $N=3$.
 ```matlab
 A = [1 2
      3 4
@@ -22,16 +22,19 @@ a_{31} b_{11} + a_{32} b_{21}, & a_{31} b_{12} + a_{32} b_{22}, & a_{31} b_{13} 
 \end{array}\right]
 $$
 
-Recall that you briefly encountered matrix multiplication in the tutorial about ``for`` loops.
-The following extends the code from the ``for`` loops section into a function, which could be saved as ``matmul.m``:
+Recall that matrix multiplication was briefly encountered in the tutorial about ``for`` loops.
+The following extends the code from that section into a function, which could be saved as ``matmul.m``:
 ```matlab
 function C = matmul(A,B)
 % Matrix multiplication
 % FORMAT C = matmul(A,B)
+
+% Error checking
 if ndims(A)>2 || ndims(B)>2, error('Too many dimensions.'); end
+if size(A,2) ~= size(B,1),   error('Incompatible dimensions.'); end
+
 M = size(A,1);
 K = size(A,2);
-if size(B,1)~=K, error('Incompatible dimensions.'); end
 N = size(B,2);
 C = zeros(M,N);
 for m=1:M
@@ -50,6 +53,7 @@ C_matmul = matmul(A,B)
 C_mtimes = A*B
 disp(sum(sum((C_matmul - C_mtimes).^2)))
 ```
+In MATLAB, a vector is simply a matrix where one of the dimensions is 1.
 
 ## Transpose
 Sometimes, we swap around the rows and columns of a matrix. This is called transposing. In maths, we would denote transposing matrix $\mathbf{A}$ by $\mathbf{A}^T$. In MATLAB, we would write
@@ -65,7 +69,10 @@ which gives the answer
      2     4     6
 ```
 
-## Simultaneous equations
+## Matrix Inverse
+Before explaining what a matrix inverse is, we first look at some simultaneous equations.
+
+### Simultaneous equations
 Consider these simultaneous equations in $a$ and $b$:
 
 $$
@@ -104,9 +111,9 @@ $$
 a = 9 - 4 = 5
 $$
 
-## Matrix solutions
+### Matrix Solutions
 Solving equations like this with two parameters ($a$ and $b$ in the above example) is pretty straightforward.
-Solving them becomes harder with more equations and unknowns.
+Finding their solution becomes harder with more equations and unknowns.
 Although it might seem abstract, this type of problem is relevant to a wide variety of tasks in imaging neuroscience, from image reconstruction (where there are tens of thousands of unknowns) to fitting fMRI time series. 
 
 Now try solving the following set of equations:
@@ -119,12 +126,12 @@ $$
 \end{matrix}
 $$
 
-To do this in MATLAB, we can arrange 20, -45 and 8 into a vector that we call $\mathbf{y}$:
+To do this in MATLAB, we can arrange 20, -45 and 8 into a column vector that we call $\mathbf{y}$:
 ```matlab
 y = [20; -45; 8]
 ```
 
-The values that $a$, $b$ and $c$ are multiplied by can be arranged into a matrix $\mathbf{X}$:
+The values that $a$, $b$ and $c$ are multiplied by can be arranged into a square matrix $\mathbf{X}$:
 ```matlab
 X = [ 3 -2  1
      -5  1 -4
@@ -138,7 +145,7 @@ In MATLAB, the above simultaneous equations can be solved to give a solution $\m
 beta = X\y
 ```
 
-Alternatively, we could compute a matrix inverse ($\mathbf{P}$) and do a matrix-vector multiplication (see next) of this by $\mathbf{y}$:
+Alternatively, we could compute the matrix inverse ($\mathbf{P}$) and do a matrix-vector multiplication of this by $\mathbf{y}$:
 ```matlab
 P    = inv(X)
 beta = P*y
@@ -155,8 +162,50 @@ This simply means:
  X(2,1)*beta(1) + X(2,2)*beta(2) + X(2,3)*beta(3)
  X(3,1)*beta(1) + X(3,2)*beta(2) + X(3,3)*beta(3)]
 ```
-    
-## Least Squares Fitting
+
+## Matrix Pseudoinverse
+Matrices only have inverses if they are square.
+Sometimes, the number of unknowns may not match the number of equations, in which case the problem is under- or overdetermined.
+Obtaining solutions to problems like this can be done using a pseudoinverse.
+
+One simple illustation may be when we wish to solve the following, where there is not enough information to obtain a unique solution for both variables:
+
+$$
+a + 2b = 5
+$$
+
+Extending this illustration slightly, we could also have these equations to solve:
+
+$$
+\begin{matrix}
+a + 2b & = 5 \\
+2a + 4b & = 10
+\end{matrix}
+$$
+
+Again, there is no unique solution.
+The problem is rank deficient, because the rows/columns of the matrix would be linearly dependont on each other.
+In MATLAB, we can obtain the rank (i.e. the number of linearly independent rows or columns) of a matrix by:
+```matlab
+X = [1 2; 2 4];
+rank(X)
+```
+Another type of example, which is similar to what you are likely to encounter later is:
+```matlab
+X = [[ones(3,1); zeros(3,1)] [zeros(3,1); ones(3,1)] ones(6,1)]
+r = rank(X)
+```
+In this example, it should be clear that any column of the matrix can be constructed from a linear combination of the other columns.
+
+An inverse $\mathbf{P}$ of a matrix $\mathbf{X}$ is defined when $\mathbf{P} \mathbf{X} = \mathbf{X} \mathbf{P} = \mathbf{I}$, where $\mathbf{I}$ is an identity matrix (i.e., all zeros, but with 1 along its diagonal).
+The "pseudoinverse" (``pinv``) of a marix has a more general definition, whereby $\mathbf{X} \mathbf{P} \mathbf{X} = \mathbf{X}$.
+We can try these two definitions in MATLAB by:
+```matlab
+pinv(X)*X - eye(size(X,2))
+X*pinv(X)*X - X
+```
+
+### Least Squares Fitting
 In SPM, we work with over-determined problems, where there are more knowns than unknowns.
 For example, consider the following set of equations:
 
