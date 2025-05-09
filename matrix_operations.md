@@ -185,6 +185,8 @@ L = L'*L;
 
 % SVD
 [U,S,V] = svd(L);
+
+% Compute the matrix square root
 K = U*diag(sqrt(diag(S)))*V';
 
 % Test the result to see if the answer is almost zero
