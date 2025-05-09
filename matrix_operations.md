@@ -251,11 +251,11 @@ figure(gcf)
 In 2D, images are smoothed by convolving them with a Gaussian.  This is illustrated with this code snippet:
 ```matlab
 G = toeplitz(exp(-(0:99).^2/(2*10))/sqrt(2*pi*10));
-y = zeros(100);
+Y = zeros(100);
 ind = ceil(rand(100,1)*100^2);
-y(ind) = 1;
+Y(ind) = 1;
 subplot(2,2,1);
-imagesc(y)
+imagesc(Y)
 axis image
 title('random 1s');
 
@@ -265,7 +265,7 @@ axis image
 title('Convolution matrix')
 
 subplot(2,2,3);
-imagesc(G*y*G')
+imagesc(G*Y*G')
 axis image
 title('Convolved');
 
