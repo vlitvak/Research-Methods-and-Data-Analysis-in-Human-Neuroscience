@@ -55,6 +55,21 @@ disp(sum(sum((C_matmul - C_mtimes).^2)))
 ```
 In MATLAB, a vector is simply a matrix where one of the dimensions is 1.
 
+Computing the sums (or means) over the columns of a matrix can be treated as a matrix multiplication:
+```matlab
+X = rand(4,3)
+w = ones(4,1);
+s = w'*X
+sum(X)
+```
+
+Similarly, computing the sum of squares of a vector can also be conceptualised this way:
+```
+x = randn(4,1)
+ss = x'*x
+sum(x.^2)
+```
+
 ## Transpose
 Sometimes, we swap around the rows and columns of a matrix. This is called transposing. In maths, we would denote transposing matrix $\mathbf{A}$ by $\mathbf{A}^T$. In MATLAB, we would write
 ```matlab
@@ -168,7 +183,7 @@ Matrices only have inverses if they are square.
 Sometimes, the number of unknowns may not match the number of equations, in which case the problem is under- or overdetermined.
 Obtaining solutions to problems like this can be done using a pseudoinverse.
 
-One simple illustation may be when we wish to solve the following, where there is not enough information to obtain a unique solution for both variables:
+This simple illustation is a case where there is not enough information to obtain a unique solution for both variables:
 
 $$
 a + 2b = 5
@@ -190,6 +205,7 @@ In MATLAB, we can obtain the rank (i.e. the number of linearly independent rows 
 X = [1 2; 2 4];
 rank(X)
 ```
+
 Another type of example, which is similar to what you are likely to encounter later is:
 ```matlab
 X = [[ones(3,1); zeros(3,1)] [zeros(3,1); ones(3,1)] ones(6,1)]
@@ -206,7 +222,7 @@ X*pinv(X)*X - X
 ```
 
 ### Least Squares Fitting
-In SPM, we work with over-determined problems, where there are more knowns than unknowns.
+In SPM, we work with over-determined problems, where there are more knowns than unknowns, and where there may be inconsistencies among them.
 For example, consider the following set of equations:
 
 $$
@@ -236,11 +252,11 @@ and a data vector ``y``:
 y = [5 7.5 9 11.5 13]'
 ```
 
-
 The least squares solution can be found in MATLAB by:
 ```matlab
 beta = X\y
 ```
+
 However, we can not do the following because $\mathbf{X}$ is not square, so does not have an inverse:
 ```matlab
 P    = inv(X)
@@ -252,6 +268,7 @@ Instead, we could compute a pseudo-inverse $\mathbf{P} = (\mathbf{X}^T \mathbf{X
 P    = inv(X'*X)*X'
 beta = P*y
 ```
+
 In the above, `` X'*X `` means do a matrix multiplication of the transposed version of $\mathbf{X}$ with itself not transposed.
 
 The residuals ($\mathbf{r}$) can be computed from
@@ -262,7 +279,7 @@ r = X*beta - y
 In MATLAB, ``size(X,1)`` and ``size(X,2)`` give the number of rows and columns of ``X``, respectively.
 The mean squared residuals (correcting for loss of degrees of freedom because we estimate two parameters $b_1$ and $b_2$) is then by:
 ```matlab
-v = sum(r.^r)/(size(X,1)-size(X,2))
+v = sum(r.^r)/(size(X,1)-rank(X))
 ```
 In the above, the `` .* `` denotes element-by element multiplication. Another way of achieving the same result ($(r_1^2 + r_2^2 + r_3^2 + r_4^2 + r_5^2)/3$) is by:
 ```matlab
