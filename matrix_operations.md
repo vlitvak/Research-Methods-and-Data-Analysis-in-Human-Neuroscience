@@ -241,10 +241,18 @@ t2 = toeplitz([1 0.75 0.25 0.125 0 0 0],[1 -1 0 0 0 0 0])
 
 Later, you will encounter convolution, which can be conceptualised as multiplication with a toeplitz matrix, as illustrated in 1D here:
 ```matlab
-T = toeplitz([1 0.75 0.25 0.125 zeros(1, 100-4)]/1.5625);
+% Generate a Toeplitz matrix
+f = gampdf(0:99,5,1);
+T = toeplitz(f,[f(1) zeros(1,99)]);
+
+% Simulate some delta functions
 y = zeros(100,1);
-y(20:10:80) = 1;
+y(20:30:80) = 1;
+
+% Show the original and convolved
+clf
 plot([y T*y]);
+legend('Original','Convolved')
 figure(gcf)
 ```
 
