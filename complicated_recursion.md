@@ -32,12 +32,12 @@ function t = game_over(G)
     % Show the board and decide whether the game is finished
 
     % Display the board
-    num = char(reshape(1:9,3,3)'+'0');
+    num = char(reshape(1:9,3,3)'+'₀');
     Gt  = G;
     Gt(G==' ') = num(G==' ');
     s   = ('   ')';
-    v   = ('|||')';
-    disp(['/-------\'; v s Gt(:,1) s Gt(:,2) s Gt(:,3) s v; '\-------/'])
+    disp(' ')
+    disp([s Gt(:,1) s Gt(:,2) s Gt(:,3) s])
 
     % Check whether to terminate, and show the result if relevant
     f = score(G);
