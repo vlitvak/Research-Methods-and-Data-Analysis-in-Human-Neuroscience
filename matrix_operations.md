@@ -170,10 +170,10 @@ As you will discover for fMRI, sometimes the weighting matrix needs to also incl
 The reason for this is that there are temporal correlations in the noise.
 When it is known, or can be estimated, the weighting matrix is the inverse of the covariance matrix of the noise.
 
-The least-squares estimate of ``beta`` can be computed from ``beta = (X'*L*W)\X'*L*y``.
+The least-squares estimate of ``beta`` can be computed from ``beta = (X'*L*X)\X'*L*y``.
 One way to achieve the same result is to pre-whiten both the data ``y`` and the design matrix ``X``.
 This is done by pre-multiplying both ``X`` and ``y`` with a matrix ``K``, such that ``K'*K == L``.
-This means that we would be computing ``beta = (X'*K'*K*W)\X'*K'*K*y``.
+This means that we would be computing ``beta = (X'*K'*K*X)\X'*K'*K*y``, which is equivalent.
 
 Because ``L`` is symmetric and positive definite, we can use SVD to derive a suitable ``K`` matrix.
 This is because SVD of a symmetric positive definite matrix gives ``U`` and ``V`` matrices that are the same.
@@ -187,15 +187,82 @@ L = L'*L;
 [U,S,V] = svd(L);
 
 % Compute the matrix square root
-K = U*diag(sqrt(diag(S)))*V';
+K = U*diag(sqrt(diag(S)))*U';
 
 % Test the result to see if the answer is almost zero
-ss = sum(sum((K'*K - L).^2))
+ss = sum(sum((K*K - L).^2))
 ```
 
 The ``K`` matrix is the matrix square root of ``L``.
 A similar approach can also be used for computing matrix logarithms, matrix exponentials, and various other matrix functions - providing the matrix is symmetric positive definite.
 When this is not the case, a slightly different strategy is needed (which involves eigenvalues and eigenvectors - if you must know).
+Alternatively, we could just use MATLAB's ``sqrtm`` function to compute matrix square roots.
+
+```matlab
+N = 100;
+
+% Simulate a covariance matrix
+Sig = randn(N);
+Sig = Sig'*Sig/N;
+
+% Simulate a design matrix
+X = [ones(N,1) randn(N,2)];
+
+% Simulate some data
+beta_gt = rand(3,1);
+y = X*beta_gt + sqrtm(Sig)*randn(N,1);
+
+% L should be (proportional to) the inverse of the covariance
+L = inv(Sig);
+
+% Estimate beta one way
+beta = (X'*L*X)\X'*L*y
+
+% Estimate beta from re-whitened X and y
+W = sqrtm(L);
+Xw = W*X;
+yw = W*y;
+beta = Xw\yw
+
+% Notice that the results differ from naive least squares estimation,
+% which (on average) gives a solution that is further from the ground truth
+beta_wrong = X\y
+```
 
 
+## Toeplitz Matrices
+Correlated noise in fMRI data is normally modelled by a toeplitz matrix.
+Rather than describe what a toeplitz matrix is, you can see what one looks like by pasting the following examples into MATLAB:
+```matlab
+T1 = toeplitz([1 0.75 0.25 0.125 0 0 0])
+t2 = toeplitz([1 0.75 0.25 0.125 0 0 0],[1 -1 0 0 0 0 0])
+```
+
+Later, you will encounter convolution, which can be conceptualised as multiplication with a toeplitz matrix, as illustrated in 1D here:
+```matlab
+T = toeplitz([1 0.75 0.25 0.125 zeros(1, 100-4)]/1.5625);
+y = zeros(100,1);
+y(20:10:80) = 1;
+plot([y T*y]);
+figure(gcf)
+```
+
+In 2D, images are smoothed by convolving them with a Gaussian.  This is illustrated with this code snippet:
+```matlab
+G = toeplitz(exp(-(0:99).^2/(2*10))/sqrt(2*pi*10));
+y = zeros(100);
+ind = ceil(rand(100,1)*100^2);
+y(ind) = 1;
+subplot(2,1,1);
+imagesc(y)
+axis image
+title('random 1s');
+
+subplot(2,1,2);
+imagesc(G*y*G)
+axis image
+title('smoothed');
+colormap(gray)
+figure(gcf)
+```
 
