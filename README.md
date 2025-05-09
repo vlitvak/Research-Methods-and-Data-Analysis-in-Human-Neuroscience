@@ -13,7 +13,7 @@ Teaching material for the Research Methods and Data Analysis in Human Neuroscien
   
     The array operations dealt with so far have not included matrix multiplications, matrix division, etc.
     Understanding some linear algebra will be essential for understanding the statistical analyses you do with the SPM software.
-    * [Basic Linear Algebra](linear_algebra.md). The basic ideas relevant to fitting a linear combination of basis functions to a vector of data.
+    * [Basic Linear Algebra](linear_algebra.md). Concepts relevant to fitting linear combinations of basis functions to vectors of data.
 
 * **SPM Statistics**
 
