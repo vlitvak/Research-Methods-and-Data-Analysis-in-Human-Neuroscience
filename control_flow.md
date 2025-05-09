@@ -125,6 +125,52 @@ s = svd(X)
 
 Help about using a functions can be found by typing ``help`` followed by a space and then the name of the function.
 
+### Element-by-element Functions
+
+Arrays can be added and subtracted, providing their dimensions are compatible. The simplest case is when the arrays are the same size, such as this example:
+```matlab
+Y = randn(3,4);
+X = randn(3,4);
+disp(X+Y)
+```
+Addition and subtraction also work if one of the dimensions is 1.
+Try this example:
+```matlab
+Y = 1:8;
+X = (1:3)'*10;
+disp(X+Y)
+disp(X-Y)
+```
+
+Elements of arrays can be multiplied and divided in a similar way, but to distinguish it from matrix multiplication or matrix division, the notation uses ``.*`` or ``./``.
+```matlab
+disp(X.*Y)
+disp(X./Y)
+```
+Note that ``+``, ``-``, ``.*`` and ``./`` are actually a convenient shorthand for the ``plus``, ``minus``, ``times`` and ``rdivide`` functions.
+```matlab
+disp(plus(X,Y))
+disp(minus(X,Y))
+disp(times(X,Y))
+disp(rdivide(X,Y))
+```
+
+There are a load of other mathematical operations that can also be applied element-by-element, such as ``sin``, ``cos``, ``tan``, ``log`` and ``exp``.
+
+
+### other Functions of arrays
+
+Some functions that can be applied to arrays, which don't work independently among the elements, include ``sum``, ``mean``, ``prod`` (product), ``cumsum`` (cumulative sum) and ``cumprod`` (cumulative product).
+```matlab
+X = rand(2,10);
+disp(sum(X,2))
+disp(prod(X,2))
+disp(cumsum(X,2))
+disp(cumprod(X,2))
+```
+
+There are also the matrix operations, which will be covered later.
+
 ## Creating Functions
 You can create your own functions by editing a file, which ends in the prefix ``.m``, that is somewhere in the search path that MATLAB uses.
 You can see this search path by typing:
