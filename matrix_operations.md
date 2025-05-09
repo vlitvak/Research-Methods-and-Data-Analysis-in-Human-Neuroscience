@@ -231,8 +231,9 @@ beta_wrong = X\y
 
 
 ## Toeplitz Matrices
-Correlated noise in fMRI data is normally modelled by a toeplitz matrix.
-Rather than describe what a toeplitz matrix is, you can see what one looks like by pasting the following examples into MATLAB:
+Correlated noise in fMRI data is normally modelled by toeplitz matrices, which describe the covariance of autocorrelated noise.
+Rather than describe what a toeplitz matrix is, it might be easier to simply show you.
+Try pasting the following examples of toeplitz matrices into MATLAB:
 ```matlab
 T1 = toeplitz([1 0.75 0.25 0.125 0 0 0])
 t2 = toeplitz([1 0.75 0.25 0.125 0 0 0],[1 -1 0 0 0 0 0])
