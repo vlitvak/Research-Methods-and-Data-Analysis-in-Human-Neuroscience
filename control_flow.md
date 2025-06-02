@@ -234,8 +234,6 @@ fact5 = pling(5)
 factorial(5)
 ```
 
-For the really curious, a much more complicated example of recursion is shown [here](complicated_recursion.md).  This is entirely optional though.
-
 ## Function Handles
 MATLAB also includes a way to create simple functions that return a single argument. This can be done using ``@``.
 For example, typing the following into MATLAB will create a function called ``quad``:
