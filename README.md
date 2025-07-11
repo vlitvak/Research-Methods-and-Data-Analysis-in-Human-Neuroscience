@@ -4,6 +4,7 @@ Teaching material for the Research Methods and Data Analysis in Human Neuroscien
 * **Learning MATLAB**
   
     This tutorial cannot teach you everything about the MATLAB language, but the following should give you a flavour of the language (along with some concepts that generalise to other languages).
+    * [Desktop Basics](desktop_basics.md). An introduction to the MATLAB desktop and basic commands.
     * [Variables](variables.md). An introduction to MATLAB variables.
     * [Other Types](other_types.md). A few more types of variables.
     * [Structures and Cell Arrays](cells_and_structs.md). Ways to organise data in MATLAB.
@@ -19,5 +20,6 @@ Teaching material for the Research Methods and Data Analysis in Human Neuroscien
 * **SPM Statistics**
 
     Now that you should understand a bit more about working with matrices, you can use this knowledge to understand more about how to statistically analyse fMRI data.
+    * [Introducing SPM](installing_spm.md). How to install SPM and check that it is working.
     * [Statistical Tests](linear_model.md). How t and F tests are implemented in SPM.
     * [Haemodynamic Modelling](haemodynamic_modelling.md). Modifications for working with fMRI data.
