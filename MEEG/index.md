@@ -27,4 +27,11 @@ Open SPM and ensure it is set to the EEG modality. To do this, type
 `spm eeg` into the MATLAB command window. For this to work, SPM root
 folder must be in your MATLAB path.
 
+Later, when you run your own scripts, you can make sure that SPM is set to the EEG modality by adding the following line at the beginning of your script:
+
+```matlab
+spm('eeg');     
+```
+
+
 
