@@ -118,41 +118,63 @@ prepended with a `d`.
 
 Save the configured batch by selecting "File" from the top toolbar and then "Save Batch". Choose a meaningful file name, such as `batch_preproc_meeg_downsample`.
 
+### High-pass filtering
+
+The next step is to high-pass filter the data to remove slow drifts in the signal. This is important because these drifts can obscure the neural signals of interest, especially in the EEG data. To do this, start a new batch and select "Filter" from the "SPM -- M/EEG -- Preprocessing" menu. In the Current Module window, select the input file as the output of the previous step (`dspmeeg_run_01_sss.mat`) and set the "Band" to "highpass". Set the frequency cut-off by clicking on the "Cutoff (s)" variable and entering a value. The recommended high-pass filter frequency is 0.5Hz, which is usually sufficient for most M/EEG analyses. However, you can also try a different value (e.g., `1` for 1Hz). Now run the batch step The output file will be prepended with an `f`. Save the configured batch by selecting "File" from the top toolbar and then "Save Batch". Choose a meaningful file name, such as `batch_preproc_meeg_filter`. 
+
+Note that the order of the preprocessing steps can vary. Sometimes changing the order does not make much difference, in other cases it could have a significant impact on the results. It is usually advisable to high-pass filter the data early in the pipeline to get rid of possible large offsets in the data (called DC offsets). If this is not done then subsequent low-pass filtering steps may generate so called "ringing artefacts" at the edges of the data (that look like a series of high amplitude deflections). In this case, we are not very worried about this because there are stretches of unused data at the beginning and end of each block which will be removed soon at the epoching step. Downsampling early accelerates all the subsequent steps due to the reduced data size so here we chose to put the filtering step after it.
+
 ### Review
 
-When analysing M/EEG data, it is a good idea to review the intermediate results at least after steps that change the data. This can help identify any potential issues or artifacts before moving on to the following steps. Go to the main SPM window  (the one with many buttons) and select "Display" (one the left, third from the bottom), then select "M/EEG". In the dialog that opens select the `dspmeeg_run_01_sss.mat` file.  This will open the M/EEG Review window. The first thing you will see is the "Info" tab, which contains some information about the data, including the number of trials, channels, and sampling frequency. You can also see the "History" section, which lists all the preprocessing steps that have been applied to this file so far. Click on the `EEG` tab and you will see the EEG data plotted as a time series for each channel. You can scroll through the time by using the arrow keys and scroll bar at the bottom of the window. In the toolbar at the top of the window you can find buttons for changing the scale of the time and the amplitude axes. When scrolling through the data you might see vertical lines. These indicate the stimulus onset times. If any channels were marked as bad in the previous step, they will be shown as dashed lines. Try also clicking on the `MEG` and `MEGPLANAR` tabs to see the MEG data. Can you see anything obviously different between the waveforms of the three sensor types?
+When analysing M/EEG data, it is a good idea to review the intermediate results at least after steps that change the data. This can help identify any potential issues or artifacts before moving on to the following steps. Go to the main SPM window  (the one with many buttons) and select "Display" (one the left, third from the bottom), then select "M/EEG". In the dialog that opens select the `fdspmeeg_run_01_sss.mat` file.  This will open the M/EEG Review window. The first thing you will see is the "Info" tab, which contains some information about the data, including the number of trials, channels, and sampling frequency. You can also see the "History" section, which lists all the preprocessing steps that have been applied to this file so far. Click on the `EEG` tab and you will see the EEG data plotted as a time series for each channel. You can scroll through the time by using the arrow keys and scroll bar at the bottom of the window. In the toolbar at the top of the window you can find buttons for changing the scale of the time and the amplitude axes. When scrolling through the data you might see vertical lines. These indicate the stimulus onset times. If any channels were marked as bad in the previous step, they will be shown as dashed lines. Try also clicking on the `MEG` and `MEGPLANAR` tabs to see the MEG data. Can you see anything obviously different between the waveforms of the three sensor types?
 
 ![SPM M/EEG Review Window](reviewing.png)
 
 *Figure: Example of the SPM M/EEG Review window displaying EEG data.*
 
-### High-pass filtering
-
-The next step is to high-pass filter the data to remove slow drifts in the signal. This is important because these drifts can obscure the neural signals of interest, especially in the EEG data. To do this, start a new batch and select "Filter" from the "SPM -- M/EEG -- Preprocessing" menu. In the Current Module window, select the input file as the output of the previous step (`dspmeeg_run_01_sss.mat`) and set the "Band" to "highpass". Set the frequency cut-off by clicking on the "Cutoff (s)" variable and entering a value. The recommended high-pass filter frequency is 0.5Hz, which is usually sufficient for most M/EEG analyses. However, you can also try a different value (e.g., `1` for 1Hz). Now run the batch step The output file will be prepended with an `f`. Save the configured batch by selecting "File" from the top toolbar and then "Save Batch". Choose a meaningful file name, such as `batch_preproc_meeg_filter`. 
-
-Note that the order of the preprocessing steps can vary. Sometimes changing the order does not make much difference, in other cases it could have a significant impact on the results. It is usually advisable to high-pass filter the data early in the pipeline to get rid of possible large offsets in the data (called DC offsets). If this is not done then subsequent low-pass filtering steps may generate so called "ringing artefacts" at the edges of the data (that look like a series of high amplitude deflections). In this case, we are not very worried about this because there are stretches of unused data at the beginning and end of each block which will be removed soon at the epoching step. Downsampling early accelerates all the subsequent steps due to the reduced data size so here we chose to put the filtering step after it. 
-
 ### Epoching
 
-The next step is to epoch the data, which means to cut it into smaller segments around the events of interest (in this case, the stimulus onset). This is important because it allows us to analyse the data in relation to specific events, such as stimulus presentation or response. To do this, select "Epoching" from the "SPM -- M/EEG -- Preprocessing" menu. In the Current Module window, select the input file as the output of the previous step (`fdspmeeg_run_01_sss.mat`).
+The next step is to epoch the data, which means to cut it into smaller segments around the events of interest (in this case, the stimulus onset). This is important because it allows us to analyse the data in relation to specific events, such as stimulus presentation or response. In this case the information necessary for epoching has already been collated by the researchers who published the dataset. However, we will first show how you would go about it if you had to do it yourself. 
+
+Assuming the reviewing tool is still open (if not, repeat the steps from the previous section), press the `Prepare SPM file` button in the top right corner of the reviewing tool window. A menu will appear at the top of the SPM interactive window (the small square window that appears on the bottom left when you first run SPM).
+
+> **Tip:**  
+> If you don't see all the SPM windows you can use the command  
+> 
+> ```matlab
+> spm('show');
+> ```
+> 
+> to bring them all to the front.
+
+From the "Batch inputs" menu select "Trial definition". This will launch an interactive tool that will ask for a series of user inputs to generate a trial definition file. The first question is asking to for "[2] Time window (ms)" the "[2]" inidicates that the response is expected to consist of 2 numbers. These are the beginning and the end of the time window of interest relative to an event (in our case the visual stimulus). You could specify "[-500 1300]". Although the window we are actually interested in is shorter than that, taking a large safety margin around it is useful as it will allow for edge artefacts that could be generated by some of later processing steps to be removed. The next question is "How many conditions?". This is referring to the number of different trial types we would like to define. In this case we have 3 conditions: Familiar, Unfamiliar and Scrambled faces so we will say "3". Note that this choice is not necessarily dictated by the data. We could as well define 2 conditions, "Faces" and "Scrambled faces" by pooling across familiar and unfamiliar or by ignoring one of the triggers altogether. These choices are usually made based on the experimental design and the hypotheses being tested. Next you will define the individual conditions. First you should specify the condition label. For the first condition it is "Familiar". Pressing ENTER will open a dialog box with the list of all the events recorded with the data (these were marked with vertical lines in the reviewing tool as we saw before). The details of what such a list would look like change depending on the recording system and the experimental setup. In our case it will look like shown below.
+
+![Event list](event_list.png)
+
+*Figure: Event list for trial definition.*
+
+Each row in the list corresponds to one event type and contains three fields: 
+
+* Type - in this case STI101_up or STI101_down. STI101 is the name of the trigger channel, and _up indicates that the event was marked by a rising edge of the signal on this channel and_down indicates that the event was marked by a falling edge of the signal on this channel. 
+* Value - in this case is the value of the signal on the trigger channel. The computer sending events to the acquisition system can set the signal voltage to distinguish between different events.
+* Number of instances of this event type - this can be useful e.g. because the important triggers usually appear many times in the data.
+
+Familiar faces in our case could be encoded by STI101_up trigger with values 5, 6 or 7 (there was a further distinction between these three values in the original experiment that we will not get into here). You can select all the three rows together by using Shift-Click (for consectutive rows) or Ctrl-Click (for non-consecutive rows). Once you have selected the rows as shown in the figure, click `OK` to confirm your selection. You will then be ask to specify the "Shift triggers" parameter. This is useful e.g. for cases where the recorded trigger time does not match the actual stimulus presentation time. In this case, we can keep the default value of zero. The next condition is "Unfamiliar", which is encoded by STI101_up with values 13, 14 or 15. Repeat the same process as above to select these rows. Finally, for the "Scrambled" condition, select STI101_up with values 17, 18, 19. Once you have defined all three conditions, you will be asked if you want to review individual trials. If you respond "Yes", you will be presented with a trial list as shown below.
+
+![Select events interface](select_events.png)
+
+*Figure: Selected events list.*
+
+This list includes the serial number of each trial, the condition label and the time of the event in seconds relative to the start of the recording. You can use it to select a subset of trials or to exclude some of them by Shift- and Ctrl- clicking on the rows. In this case, we will not exclude any trials, so just click "OK". The next step is to save the trial definition file. You can save it in the same directory as the M/EEG data, with a name like `run_01_trials.mat`.  Once you have saved the trial definition file, you can press `OK` in the bottom left corner of the interactive window to go back to the reviewing tool. 
+
+Now you can return to the Batch tool and select "Epoching" from the "SPM -- M/EEG -- Preprocessing" menu. In the Current Module window, select the input file as the output of the previous step (`fdspmeeg_run_01_sss.mat`). Next you should specify how to define the trials. Click on the "Trial definition file" variable and select the  file `run_01_trldef.mat`. From the "Trials" subfolder. You now know how this kind of file could be created. You could also explore the "Define trial" option that closely mirrors the interactive trial definition tool we just used. Once the trial definition file is selected, you can run the batch. The output file name will be prepended with an `e`. Save the configured batch by selecting "File" from the top toolbar and then "Save Batch". Choose a meaningful file name, such as `batch_preproc_meeg_epoch`.
 
 ### Baseline Correction
 
-The next step in this preprocessing pipeline is to baseline correct the
-data by subtracting from each channel the mean from -100ms to 0ms
+Baseline correction is a common preprocessing step in M/EEG data analysis. It involves subtracting the mean of the data in a specified time window (the baseline) usually before the event of interest (e.g., stimulus onset) from the data in the entire trial. This helps to remove any baseline shifts or drifts in the data that could affect the analysis. Epoching the data in the previous step has already resulted in baseline correction using the [-500 0]ms as the baseline period. This is not ideal as the baseline with the safety margin is too long. created a baseline period, which is the time before the stimulus onset. So we will redefine the baseline to be from -100ms to 0ms
 relative to the stimulus onset. Select "Baseline Correct" from under the
-"SPM -- M/EEG -- Preprocessing" menu. Select the input file name as
-being dependent on the output of the downsampling by selecting the
-"Dependency". To define the baseline, highlight the "Baseline" button in
-the current module window and click on the "Specify" button. The
-baseline needs to be entered as a 1-by-2 array. Enter `[-100 0]` (units
-are milliseconds). The prefix of this file name will be `b`. Note, that
-to be on the safe side it might be a good idea to perform baseline
-correction before downsampling. The reason is that in the general case
-there might be large DC offsets in the data leading to prolonged ringing
-that even padding will not protect against. For our data, however, the
-order shown here works equally well.
-
+"SPM -- M/EEG -- Preprocessing" menu. Select the output file of the previous step (`efdspmeeg_run_01_sss.mat`) as the input file. In the Current Module window, you will see a variable called "Baseline". This is where you can specify the baseline period. Click on "Baseline" and then click on "Specify". A dialog box will appear where you can enter the baseline period as a 1-by-2 array. Enter `[-100 0]` (units are milliseconds). The output file will be prepended with a `b`. Save the configured batch by selecting "File" from the top toolbar and then "Save Batch". Choose a meaningful file name, such as `batch_preproc_meeg_baseline`.
+ 
 ### Deleting intermediate steps (optional)
 
 The four steps (modules) described above create a preprocessing pipeline
