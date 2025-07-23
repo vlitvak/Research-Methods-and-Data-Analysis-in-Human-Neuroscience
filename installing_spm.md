@@ -21,7 +21,7 @@ To install SPM, you need to download it from the web and let Matlab know where t
 7. To make this change permanent, you can save the path by typing:
 
    ```
-   savepath;
+   savepath(fullfile('N:\Documents\MATLAB', 'pathdef.m'));
    ```
 8. To check that SPM is installed correctly, type the following command in the Matlab command window:
 

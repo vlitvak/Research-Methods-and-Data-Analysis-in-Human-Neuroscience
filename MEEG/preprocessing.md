@@ -174,12 +174,26 @@ Now you can return to the Batch tool and select "Epoching" from the "SPM -- M/EE
 Baseline correction is a common preprocessing step in M/EEG data analysis. It involves subtracting the mean of the data in a specified time window (the baseline) usually before the event of interest (e.g., stimulus onset) from the data in the entire trial. This helps to remove any baseline shifts or drifts in the data that could affect the analysis. Epoching the data in the previous step has already resulted in baseline correction using the [-500 0]ms as the baseline period. This is not ideal as the baseline with the safety margin is too long. created a baseline period, which is the time before the stimulus onset. So we will redefine the baseline to be from -100ms to 0ms
 relative to the stimulus onset. Select "Baseline Correct" from under the
 "SPM -- M/EEG -- Preprocessing" menu. Select the output file of the previous step (`efdspmeeg_run_01_sss.mat`) as the input file. In the Current Module window, you will see a variable called "Baseline". This is where you can specify the baseline period. Click on "Baseline" and then click on "Specify". A dialog box will appear where you can enter the baseline period as a 1-by-2 array. Enter `[-100 0]` (units are milliseconds). The output file will be prepended with a `b`. Save the configured batch by selecting "File" from the top toolbar and then "Save Batch". Choose a meaningful file name, such as `batch_preproc_meeg_baseline`.
+
+### Building a pipeline
+
+If you followed all the steps until now, you should have a series of batch files that perform different preprocessing steps on the M/EEG data. However, it is often useful to combine these steps into a single pipeline that can be run in one go. To do this, you can create a new batch file that includes all the steps in the correct order. Start a new batch by pressing the `New` button. Now press the `Open` button, this will open the file selection dialogue and if you are in the right folder, you should see all the batch files you saved before. The dialogue allows you to select files by clicking on them and if you click on multiple files they will be added to a list. You should now click in the correct order which is the same order of steps we described above: 
+
+* `batch_preproc_meeg_convert`
+* `batch_preproc_meeg_prepare`
+* `batch_preproc_meeg_downsample` 
+* `batch_preproc_meeg_filter`
+* `batch_preproc_meeg_epoch`
+* `batch_preproc_meeg_baseline`
+
+ Once you have selected all the files, click on `Done`. This will add all the selected batch files to the current batch editor window.  You can now run this batch by pressing the green play button in the top toolbar. This will execute all the steps in the order they were added to the batch editor. However, there is one more step that you need to do to make the batch generic. Right now, the input file names are hard-coded in each step of the batch. But it would be better to just specify that the input for each step is the output of the previous step. Then we would only need to select the raw data file for conversion and the rest will follow automatically. This can be done by using the `Dependency` button in the Current Module window. For each step starting from `Prepare`, click on the "File Name" variable and then click on the `Dependency` button. This will open a dialog box where you can select the output a previous step from the list of all the steps preceding the current one. Once you have done this, you can save the batch file with a meaningful name, such as `batch_preproc_meeg_pipeline`.
+
  
 ### Deleting intermediate steps (optional)
 
-The four steps (modules) described above create a preprocessing pipeline
-for the data. If this pipeline is run straight away, there will be four
-different output files. If you are short of diskspace, you might want to
+The six steps (modules) described above create a preprocessing pipeline
+for the data. If this pipeline is run straight away, there will be five
+different output files (because the `Prepare` step does not create a new output file but modifies its input). If you are short of diskspace, you might want to
 delete some of the intermediate files. To do this, select "SPM" from the
 top toolbar of the batch editor window and choose "M/EEG -- Other --
 Delete" several times. Then you will need to specify the File Names to
@@ -187,9 +201,7 @@ delete. Highlight each "Delete" module and set the File Name as the
 output of the Prepare step using the "Dependency" button to delete any
 output from the conversion/prepare step onward. In fact, all processing
 steps up until the most recent step (Baseline-correction) can be
-deleted. To do this, right click on "Delete" in the Module List and
-select "Replicate Module", but change the dependency to the downsampled
-file.
+deleted. Save the resulting batch once again.
 
 ## Creating a script for combining pipelines within a subject.
 
@@ -200,33 +212,43 @@ subjects. In the present case, there were 6 independent MEG runs
 can all be processed identically. One option would be to save the batch
 file, manually alter the "File Name" that is initially loaded into the
 batch editor, and repeat this process separately for each run. A more
-powerful approach is to create a script. To do this, select "File" from
-the Batch Editor window, and select "Save Batch and Script". This will
+powerful approach is to create a script. 
+
+To do this, first clear all the subject-specific inputs from the batch. 
+
+* `File name` in the "Conversion" step
+* `Channel file` in the "Prepare" step  
+* `Trial definition file` in the "Epoching" step
+
+Right-click on each of these variables and select "Clear Value".
+
+Select "File" from the Batch Editor window, and select "Save Batch and Script". This will
 produce two files: a batch file (same as that created when you save a
 batch) but also a MATLAB script that calls that batch file. So if you
-call the batch file `batch_preproc_meeg_convert`, you will get a batch
-file called `batch_preproc_meeg_convert_job.m` and a script file called
-`batch_preproc_meeg_convert.m`.
+call the batch file `batch_preproc_meeg_pipeline`, you will get a batch
+file called `batch_preproc_meeg_pipeline_job.m` and a script file called
+`batch_preproc_meeg_pipeline.m`.
 
-The script file `batch_preproc_meeg_convert.m` will automatically be
+The script file `batch_preproc_meeg_pipeline.m` will automatically be
 loaded into the MATLAB editor window, and should appear something like
 this:
 
 ```matlab
+% List of open inputs
 % Conversion: File Name - cfg_files
-% Conversion: Trial File - cfg_files
 % Prepare: Channel file - cfg_files
+% Epoching: Trial definition file - cfg_files
 nrun = X; % enter the number of runs here
-jobfile = {'batch_preproc_meeg_convert_job.m'};
+jobfile = {'N:\...\MEEG\batch_preproc_meeg_pipeline_job.m'};
 jobs = repmat(jobfile, 1, nrun);
 inputs = cell(3, nrun);
 for crun = 1:nrun
     inputs{1, crun} = MATLAB_CODE_TO_FILL_INPUT; % Conversion: File Name - cfg_files
-    inputs{2, crun} = MATLAB_CODE_TO_FILL_INPUT; % Conversion: Trial File - cfg_files
-    inputs{3, crun} = MATLAB_CODE_TO_FILL_INPUT; % Prepare: Channel file - cfg_files
+    inputs{2, crun} = MATLAB_CODE_TO_FILL_INPUT; % Prepare: Channel file - cfg_files
+    inputs{3, crun} = MATLAB_CODE_TO_FILL_INPUT; % Epoching: Trial definition file - cfg_files
 end
 spm('defaults', 'EEG');
-spm_jobman('run', jobs, inputs{:}); 
+spm_jobman('run', jobs, inputs{:});
 ```
 
 At the top of this script is listed the variable `nrun = X`: replace `X`
@@ -241,41 +263,24 @@ because the files are named systematically by run, we can complete the
 relevant lines of the script with:
 
 ```matlab
-inputs{1, crun} = cellstr(fullfile(rawpth,'Sub15','MEEG',sprintf('run_%02d_sss.fif',crun)));
+     inputs{1, crun} = cellstr(fullfile(rawpth,'Sub15','MEEG',sprintf('run_%02d_sss.fif',crun)));
      inputs{2, crun} = cellstr(fullfile(rawpth,'Sub15','MEEG','Trials',sprintf('run_%02d_trldef.mat',crun)));
      inputs{3, crun} = cellstr(fullfile(rawpth,'Sub15','MEEG','bad_channels.mat'));
 ```
 
 where `rawpth` refers to your base directory, `Sub15` is the subject
-directory that contains `MEG` and `Trials` sub-directories (assuming you
-mirrored the directory structure from the FTP site) and `%02d` refers to
+directory that contains `MEG` and `Trials` sub-directories and `%02d` refers to
 the run number, expressed as two digits.
 
 The other file -- the batch or "job" file -- can be reloaded into the
 batch editor at any time. It can also be viewed in the MATLAB editor. If
-you type `edit batch_preproc_meeg_convert_job.m`, you will see your
-selections from the earlier GUI steps. But we need to change those
-selections that depend on the run number (so they can be passed from the
-script instead). To make the batch file accept variables from the script
-file, we need change three of the specifications to `’<UNDEFINED>’`
-instead. So edit the following lines so they read:
-
-```matlab
-matlabbatch{1}.spm.meeg.convert.dataset = '<UNDEFINED>';
-     matlabbatch{1}.spm.meeg.convert.mode.epoched.trlfile = '<UNDEFINED>';
-     ...
-     matlabbatch{2}.spm.meeg.preproc.prepare.task{4}.setbadchan.channels{1}.chanfile = '<UNDEFINED>';
-```
-
-Then save these edits (overwriting the previous batch file). If you're
-unsure, the batch file should look like the
-`batch_preproc_meeg_convert_job.m` file in the `SPM12batch` part of the
-`SPMscripts` directory on the FTP site.
+you type `edit batch_preproc_meeg_pipeline_job.m`, you will see your
+selections from the earlier GUI steps. 
 
 This completes the first part of the preprocessing pipeline. You can
 then run this script by selecting the green play button on the upper
 toolbar of the script MATLAB Editor window. The results will be 6 files
-labelled `bdspmeeg_run_%02d_sss.mat`, where `%02d` refers to the run
+labelled `befdspmeeg_run_%02d_sss.mat`, where `%02d` refers to the run
 number `1-6`. If you want to view any of these output files, press
 "Display" on the main SPM menu pane, select "M/EEG", then select one of
 these files. You will be able to review the preprocessing steps as a
@@ -291,7 +296,7 @@ this, select "Merging" from "SPM -- M/EEG -- Preprocessing -- Merging",
 select "File Names", "specify", and select the 6 file names
 `bdspmeeg_run_%02d_sss.mat`. If you were to run this stage now, the
 output file would match the first input file, but be prepended with a
-`c`, i.e, `cbdspmeeg_run_01_sss.mat`. However, we will wait to add some
+`c`, i.e, `cbefdspmeeg_run_01_sss.mat`. However, we will wait to add some
 more modules before running, as below. At this stage, you could also add
 delete modules to delete all the previous individual run files (since
 the concatenated file will contain all trials from all runs, i.e,
@@ -347,8 +352,7 @@ Item" box, in order to keep all the MEG channels (which are unchanged).
 All other default values can remain the same. The output file will be
 prepended with `M`.
 
-As with the previous pipeline, if you are short of diskspace
-(particularly if you later run all 16 subjects), the outputs produced
+As with the previous pipeline, if you are short of diskspace, the outputs produced
 from the intermediate stages can be deleted using the "SPM -- M/EEG --
 Other -- Delete" function (see earlier). However, refrain from deleting
 the montaged data, as these will be used later in the Section on
@@ -359,13 +363,9 @@ Time-Frequency analysis.
 This completes the second part of the preprocessing pipeline. At this
 point, you can run the batch. Alternatively, you can save and script,
 and run the batch from a script. The resulting script can also be
-combined with the previous script created (e.g., in the `SPMscripts` FTP
-directory, scripts for all the stages are appended into a single master
-script called `master_script.m`, which loops over each subject too).
+combined with the previous script created.
 Remember that, if you want to pass variables from a script to a batch,
-you need to first ensure the relevant fields in the batch file are set
-to `’<UNDEFINED>’` (see for example the `batch_preproc_meeg_merge_job.m`
-file in the `SPM12batch` FTP directory).
+you need to first ensure the relevant fields in the batch file are cleared.
 
 To view the output, press "Display" on the main SPM menu pane, select
 "M/EEG", then select `Mcbdspmeeg_run_01_sss.mat`. Again, you will be

@@ -16,7 +16,7 @@ analysis).
 
 To crop the data, select the crop option from "SPM -- M/EEG --
 Preprocessing -- Crop". Select the datafile called
-`Mcbdespmeeg_run_01_sss.mat` produced from the final EEG re-referencing
+`Mcbefdspmeeg_run_01_sss.mat` produced from the final EEG re-referencing
 ("Montage") step above. A 100ms pre-stimulus baseline period is normally
 sufficient, and we do not care about responses after 800ms for this
 particular analysis, so we can cut off 400ms at the start and end of
@@ -28,8 +28,7 @@ with a `p`.
 
 ### Artefact detection
 
-There are many ways to define artifacts (including special toolboxes;
-see other SPM manual chapters). Here we focus on just one simple means
+There are many ways to define artifacts. Here we focus on just one simple means
 of detecting blinks by thresholding the EOG channels. Select "Artefact
 detection" from the "SPM -- M/EEG -- Preprocessing" menu. For the input
 file, select a dependency on the output of the previous step ("Crop").
